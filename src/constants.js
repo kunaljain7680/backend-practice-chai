@@ -1,1 +1,1 @@
-export const DB_NAME="kunal"  // app ke db ka nam
+export const DB_NAME="chaibackend"  // app ke db ka nam
