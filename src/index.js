@@ -10,7 +10,16 @@ dotenv.config({
 
 // Aproach-1 (sara db ka code in another folder)
 
+// as connectDB() is async method so it returns a promise when completes
 connectDB()
+.then(()=>{
+    app.listen(process.env.PORT || 8000,()=>{
+        console.log(`Server is running at port ${process.env.PORT}`)
+    })
+})
+.catch((err)=>{
+    console.log("MONGO db connection failed !!!",err)
+})
 
 // Approach-2(sb kuch index file me)
 
