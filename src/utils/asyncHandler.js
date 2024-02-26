@@ -1,3 +1,5 @@
+// as bar bar try catch wala call prevent krne ke lie make one wrapper we will pass our function into this asyncHandler method
+
 // s-1 const asyncHandler=()=>{}
 
 // s-2 const asyncHandler=(func)=>{()=>{}}
@@ -5,6 +7,8 @@
 // s-3 const asyncHandler=(func)=>async()=>{}  // passed function as a parameters and remove curly braces
 
 // using try catch
+
+// function ko further ek async function me pass krdia
 
 // const asyncHandler=(fn)=>async(req,res,next)=>{
 
@@ -45,12 +49,14 @@
 
 const asyncHandler=(requestHandler)=>{
 
-    (req,res,next)=>{
+    // accept as a function return as a function
+    
+    return (req,res,next)=>{
 
         // resolve me request hamdler execute krdo 
         Promise.resolve(requestHandler(req,res,next)).
         catch((err)=>next(err))  // if error
-    }
+    } 
 }
 
 export {asyncHandler}

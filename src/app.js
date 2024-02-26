@@ -22,5 +22,21 @@ app.use(express.static("public "));
 
 app.use(cookieParser());
 
+// routes import
+
+// This line imports the exported value from user.routes.js and assigns it to the variable named userRouter.
+// : After the import, the userRouter variable becomes a reference to the exported Router object from user.routes.js
+
+// user router is just a variable given by us and it can be done only when export is default
+
+import userRouter from "./routes/user.routes.js"
+
+// routes declaration ( as we have taken router alg so use app.get ki jagah app.use)
+
+// /api/v1 means api ka version 1 use it is just a way to call
+// this means that we will call http://localhost:8000/api/v1/users/register and user is prefix and age ise UserRouter pe register laya hua h aur bhi lgaya ja skta h
+
+app.use("/api/v1/users",userRouter);  // when a user hits a users api then control goes to userRouter i.e route in user.route.js
+
 
 export {app}
