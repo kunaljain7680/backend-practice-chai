@@ -8,3 +8,5 @@ class ApiResponse{
         this.sucess=statusCode<400  // 400 stauts code se niche koi bhi ho vo response hoga uske upar vala send through apiError
     }
 }
+
+export {ApiResponse}

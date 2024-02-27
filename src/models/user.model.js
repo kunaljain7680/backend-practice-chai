@@ -68,7 +68,7 @@ userSchema.pre("save",async function (next){
 
     if(! this.isModified("password"))return next(); // agar password field not modified then don't encrypt password and call next()
 
-    this.password=bcrypt.hash(this.password,10);   // encrypt password using bcrypt 's hash fxn which takes params as hash(lisko krna h , kitne rounds dena h/salt)  
+    this.password=await bcrypt.hash(this.password,10);   // encrypt password using bcrypt 's hash fxn which takes params as hash(lisko krna h , kitne rounds dena h/salt)  
     next()                     // as we have used function so this will have access of password field
 })
 
