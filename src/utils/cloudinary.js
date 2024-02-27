@@ -23,7 +23,12 @@ const uploadOnCloudinary=async (localFilePath)=>{
 
     // file has been uploaded successfull
     
-    console.log("File is uploaded on cloudinary",response.url);
+    // console.log("File is uploaded on cloudinary",response.url);
+
+    fs.unlinkSync(localFilePath);  // agar succesfully uploded then also remove from server
+    
+    console.log(response);
+    
     return response;
 
   } catch (error) {

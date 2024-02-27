@@ -7,7 +7,7 @@ import connectDB from "./db/index.js"; // db k andar index file me extension lag
 import {app} from "./app.js"
 
 dotenv.config({
-    path:'./env'
+    path:'./.env'
 })
 
 // Aproach-1 (sara db ka code in another folder)

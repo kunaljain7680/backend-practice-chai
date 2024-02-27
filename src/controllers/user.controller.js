@@ -3,7 +3,7 @@ import {ApiError} from "../utils/apiError.js"
 // registerUser is a method which registers users
 
 import {User} from "../models/user.model.js"
-import {UploadOnCloudinary, uploadOnCloudinary} from "../utils/cloudinary.js"
+import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/apiResponse.js"
 
 const registerUser=asyncHandler(async(req,res)=>{
@@ -40,7 +40,7 @@ const registerUser=asyncHandler(async(req,res)=>{
 
     // find user in db :  we will use findOne i.e pehle jouser find hoga vo return hoga
 
-    const existedUser=User.findOne({
+    const existedUser=await User.findOne({
 
         // this means ya to username mil je ya fir email mil je then hum response bhejenge 
         $or:[{username},{email}]
@@ -62,8 +62,13 @@ const registerUser=asyncHandler(async(req,res)=>{
 
     console.log(req.files);
 
-    const coverImageLocalPath=req.files?.coverImage[0]?.path;
+    // const coverImageLocalPath=req.files?.coverImage[0]?.path;  // as if coverImage is not given so error 
+    let coverImageLocalPath;
+// isArray tells array aya h ya nhi
 
+    if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length>0 ){
+        coverImageLocalPath=req.files.coverImage[0].path
+    }
     // avatar is required
 
     if(!avatarLocalPath){
