@@ -6,6 +6,27 @@ import {User} from "../models/user.model.js"
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/apiResponse.js"
 
+// async handler not used here as it our internal method and we are not making any web calls here
+
+const generateAccessAndRefreshTokens=async(userId)=>{
+
+    try {
+        const user=await User.findById(userId);
+
+        const accessToken=user.genrateAccessToken();
+        const refreshToken=user.generateRefreshToken();
+
+        user.refreshToken=refreshToken; // as user has a key named refershToken (see in user.models.js)
+
+        await user.save({validateBeforeSave:false});  // save krane pe mongoose k model kick-in hojenge eg:password wala bhi kick-in hojega so to handle this we use validateBeforeSave
+        
+        return {accessToken,refreshToken};
+
+    } catch (error) {
+        
+        throw new ApiError(500,"Something went wrong while genreating refresh and Acess Tokens");
+    }
+}
 const registerUser=asyncHandler(async(req,res)=>{
 
     // get user details from frontend
@@ -122,4 +143,123 @@ const registerUser=asyncHandler(async(req,res)=>{
     // hta to hum user se bhi skte h but  created user me hum
 })
 
-export {registerUser}
+
+const loginUser=asyncHandler(async(req,res)=>{
+
+    // req body se data le ao
+
+    // username ,email h ?
+
+    // find the user
+
+    // password check
+
+    // access and refresh Token both genrate(we genrated in user.models.js)
+
+    // send token in cookies
+
+    // return response 
+
+    const {email,username,password}=req.body;
+
+    if(!username || !email){
+        throw new ApiError(400,"Username or password is required");
+    }
+
+    // ya to email dhundo ya username dhundo jo pehle mil gya hume value vapis miljegi
+
+    const user=await User.findOne(
+        {
+            $or:[{email},{username}]
+        }
+    )
+
+    if(!user){
+        throw new ApiError(404,"User does not exist");
+    }
+
+    // User   ka object h so it uses mongoose wale function
+
+    // but jo humne method bnaya h isPassword correct , etc. vo humare user me available h
+    // password check
+
+    const isPasswordValid=await user.isPasswordCorrect(password);  // ye humara khud ka bnaya method h
+
+    if(!isPasswordValid){
+        throw new ApiError(401,"Invalid User Credentials");
+    }
+
+    // access and refresh tokens
+
+    const{accessToken,refreshToken}=await generateAccessAndRefreshTokens(user._id);
+    
+
+    const loggedInUser=await User.findById(user._id).select("-password -refreshToken"); // ye cheezen user ko nhi bhejni soselect method se subtract krdo
+
+    // send in form of cookies : cookies behejne k lie we have to design options to send cookies
+
+    const options={  // server sirf modify krega these cookies and frontend se modifiable nhi hongi
+
+
+        httpOnly:true,
+        secure:true,
+    }
+
+
+    // setting cookies using .cookie and jitni mazi cookies set ho skti h using .cookie .cookie krke and iske andar ek key , ke value and ek options paramter hota h 
+
+    return res.status(200)
+    .cookie("accessToken",accessToken,options)
+    .cookie("refreshToken",refreshToken,options)
+    .json(
+        
+        new ApiResponse(
+            200,
+            {
+                user:loggedInUser,accessToken,refreshToken // ye alad se cookies and referesh Token islie bheje h (pehle cookies me sert krdie the) to handle case if user need cookies , he might want to save on local storage or might be developing mobile app as wahn pe cookies set nhi hongi
+            },
+            "User logged in Successfully"
+        )
+    )
+})
+
+
+const logoutUser=asyncHandler(async(res,res)=>{
+
+    // clear cookies 
+    // db me se refreshToken reset krdo
+    // as pehle verify JWT middleware chla h and req.user is added and we come to this methid so so this(importnat)
+
+    // ye method lete h  i.e 1) find kaise krna h user ko 2) update krdo like done down
+
+    await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set:{   // this operator asks which field to update and usme jake voupdate jrdega
+
+                refreshToken:undefined
+            }
+        },{
+            new:true // isse hume jo return me response milega usme new updated value milegi
+        }
+    )
+
+    // clear cookies
+
+    const options={  // server sirf modify krega these cookies and frontend se modifiable nhi hongi
+
+
+        httpOnly:true,
+        secure:true,
+    }
+
+    return res.status(200)
+    .clearCookie("accessToken",options)  // name of cookie should be same 
+    .clearCookie("refreshToken",options)
+    .json(
+        
+        new ApiResponse(200,{},"User logged out successfully")
+    )
+})
+
+export {registerUser, loginUser,logoutUser}
