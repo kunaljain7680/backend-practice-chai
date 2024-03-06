@@ -2,9 +2,10 @@
 // user ke bad jo methods likhen hn vo is file me likhe jaenge
 
 import { Router } from "express";
-import { loginUser, logoutUser, registerUser } from "../controllers/user.controller.js"; // this type of import is done when export is not default i.e as export {registerUser}
+import { loginUser, logoutUser, refreshAccessToken, registerUser } from "../controllers/user.controller.js"; // this type of import is done when export is not default i.e as export {registerUser}
 
 import { upload } from "../middlewares/multer.middleware.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
@@ -50,4 +51,5 @@ router.route("/login").post(loginUser);
 
 router.route("/logout").post(verifyJWT,logoutUser);  // means logoutUser pe jane se pehle verifyJWT chalado to check if user is logged in and that's why next is written to go to another method here it is logoutUser
 
+router.route("/refresh-token").post(refreshAccessToken)
 export default router;

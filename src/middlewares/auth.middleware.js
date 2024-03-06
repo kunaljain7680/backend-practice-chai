@@ -1,10 +1,10 @@
 // verifies wheteher user is there or not
 
 // agar true login h i.e accessTOken and refreshToken h to strategy h ki req k andar naya object krdiya i.e user (can be any like kunal) i.e req.user
-import { ApiError } from "../utils/apiError";
-import { asyncHandler } from "../utils/asyncHandler";
+import { ApiError } from "../utils/apiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken";
-import { User } from "../models/user.model";
+import { User } from "../models/user.model.js";
 
 
 // agar response ka use nhi ho rha then we can write _ in place of it (as it is written in production grade)
